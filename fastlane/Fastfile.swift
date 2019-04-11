@@ -132,17 +132,17 @@ class Fastfile: LaneFile {
     
     func developerReleaseLane() {
         desc("Create a developer release")
-        package(config: Staging())
+       // package(config: Staging())
 //        crashlytics(
 //            ipaPath: "./\(ProjectSetting.productName).ipa",
 //            apiToken: environmentVariable(get: "CRASHLYTICS_API_KEY").replacingOccurrences(of: "\"", with: ""),
 //            buildSecret: environmentVariable(get: "CRASHLYTICS_BUILD_SECRET").replacingOccurrences(of: "\"", with: "")
 //        )
-        upload_to_testflight(
-            username: "element42.in@gmail.com",
-            app_identifier: "com.jenkinsSwift.*",
-            itc_provider: "abcde12345" //pass a specific value to the iTMSTransporter -itc_provider option
-        )
+//        upload_to_testflight(
+//            username: "element42.in@gmail.com",
+//            app_identifier: "com.jenkinsSwift.*",
+//            itc_provider: "abcde12345" //pass a specific value to the iTMSTransporter -itc_provider option
+//        )
     }
     
     func qaReleaseLane() {
