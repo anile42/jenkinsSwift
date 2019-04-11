@@ -48,56 +48,32 @@ struct Staging: Configuration {
 //    var appIdentifier = "works.sth.brewer"
 //    var exportMethod = "app-store"
 //}
-
 enum ProjectSetting {
     //static var workspace = "brewer.xcworkspace"
-    static var project = "jenkinsSwift.xcodeproj"
-    static var scheme = "jenkinsSwift"
-    static var target = "jenkinsSwift"
-    static var productName = "jenkinsSwift"
-    static let devices: [String] = ["iPhone 7", "iPad Air"]
+    static var project = "jenkinsTest.xcodeproj"
+    static var scheme = "jenkinsTest"
+    static var target = "jenkinsTest"
+    static var productName = "jenkinsTest"
+    static let devices: [String] = ["iPhone 8", "iPad Air"]
     
-    static let codeSigningPath = environmentVariable(get: "CODESIGNING_PATH").replacingOccurrences(of: "\"", with: "")
-    static let keyChainDefaultPath = environmentVariable(get: "KEYCHAIN_DEFAULT_PATH").replacingOccurrences(of: "\"", with: "")
-    static let certificatePassword = environmentVariable(get: "CERTIFICATE_PASSWORD").replacingOccurrences(of: "\"", with: "")
+    static let codeSigningPath = environmentVariable(get: "CODESIGNING_PATH")
+    static let certificatePassword = environmentVariable(get: "CERTIFICATE_PASSWORD")
     static let sdk = "iphoneos11.4"
 }
 
+
 /* Lanes */
 class Fastfile: LaneFile {
-    var stubKeyChainPassword: String = "stub"
-    
-    var keyChainName: String {
-        return "\(ProjectSetting.productName).keychain"
-    }
-    
-    var keyChainDefaultFilePath: String {
-        return "\(ProjectSetting.keyChainDefaultPath)/\(keyChainName)-db"
-    }
-    
-    func beforeAll() {
-        cocoapods()
-    }
+   
     
     func package(config: Configuration) {
-        if FileManager.default.fileExists(atPath: keyChainDefaultFilePath) {
-            deleteKeychain(name: keyChainName)
-        }
-        
-        createKeychain(
-            name: keyChainName,
-            password: stubKeyChainPassword,
-            defaultKeychain: false,
-            unlock: true,
-            timeout: 3600,
-            lockWhenSleeps: true
-        )
         
         importCertificate(
-            keychainName: keyChainName,
-            keychainPassword: stubKeyChainPassword,
             certificatePath: "\(ProjectSetting.codeSigningPath)/\(config.certificate).p12",
-            certificatePassword: ProjectSetting.certificatePassword
+            certificatePassword: ProjectSetting.certificatePassword,
+            keychainName: environmentVariable(get: "KEYCHAIN_NAME"),
+            keychainPassword: environmentVariable(get: "KEYCHAIN_PASSWORD")
+           
         )
         
         updateProjectProvisioning(
@@ -107,12 +83,11 @@ class Fastfile: LaneFile {
             buildConfiguration: config.buildConfiguration
         )
         
-        runTests(project: ProjectSetting.project,
-                 devices: ProjectSetting.devices,
-                 scheme: ProjectSetting.scheme)
+       
+                
         
         buildApp(
-            project: ProjectSetting.project,
+            //workspace: ProjectSetting.workspace,
             scheme: ProjectSetting.scheme,
             clean: true,
             outputDirectory: "./",
@@ -121,39 +96,34 @@ class Fastfile: LaneFile {
             silent: true,
             exportMethod: config.exportMethod,
             exportOptions: [
-                "signingStyle": "manual",
-                "provisioningProfiles": [config.appIdentifier: config.provisioningProfile] ],
+            "signingStyle": "manual",
+            "provisioningProfiles": [config.appIdentifier: config.provisioningProfile] ],
             sdk: ProjectSetting.sdk
-            
         )
         
-        deleteKeychain(name: keyChainName)
+       
     }
     
     func developerReleaseLane() {
-        //desc("Create a developer release")
-       // package(config: Staging())
+        desc("Create a developer release")
+        package(config: Staging())
 //        crashlytics(
 //            ipaPath: "./\(ProjectSetting.productName).ipa",
 //            apiToken: environmentVariable(get: "CRASHLYTICS_API_KEY").replacingOccurrences(of: "\"", with: ""),
 //            buildSecret: environmentVariable(get: "CRASHLYTICS_BUILD_SECRET").replacingOccurrences(of: "\"", with: "")
 //        )
-//        upload_to_testflight(
-//            username: "element42.in@gmail.com",
-//            app_identifier: "com.jenkinsSwift.*",
-//            itc_provider: "abcde12345" //pass a specific value to the iTMSTransporter -itc_provider option
-//        )
+       uploadToTestflight(username: "element42.in@gmail.com")
     }
     
-    func qaReleaseLane() {
-        desc("Create a weekly release")
-        package(config: Production())
-//        crashlytics(
-//            ipaPath: "./\(ProjectSetting.productName).ipa",
-//            apiToken: environmentVariable(get: "CRASHLYTICS_API_KEY").replacingOccurrences(of: "\"", with: ""),
-//            buildSecret: environmentVariable(get: "CRASHLYTICS_BUILD_SECRET").replacingOccurrences(of: "\"", with: "")
-//        )
-    }
+//    func qaReleaseLane() {
+//        desc("Create a weekly release")
+//        package(config: Production())
+////        crashlytics(
+////            ipaPath: "./\(ProjectSetting.productName).ipa",
+////            apiToken: environmentVariable(get: "CRASHLYTICS_API_KEY").replacingOccurrences(of: "\"", with: ""),
+////            buildSecret: environmentVariable(get: "CRASHLYTICS_BUILD_SECRET").replacingOccurrences(of: "\"", with: "")
+////        )
+//    }
     
 }
 
