@@ -131,7 +131,7 @@ class Fastfile: LaneFile {
     }
     
     func developerReleaseLane() {
-        desc("Create a developer release")
+        //desc("Create a developer release")
        // package(config: Staging())
 //        crashlytics(
 //            ipaPath: "./\(ProjectSetting.productName).ipa",
