@@ -50,10 +50,10 @@ struct Staging: Configuration {
 //}
 enum ProjectSetting {
     //static var workspace = "brewer.xcworkspace"
-    static var project = "jenkinsTest.xcodeproj"
-    static var scheme = "jenkinsTest"
-    static var target = "jenkinsTest"
-    static var productName = "jenkinsTest"
+    static var project = "jenkinsSwift.xcodeproj"
+    static var scheme = "jenkinsSwift"
+    static var target = "jenkinsSwift"
+    static var productName = "jenkinsSwift"
     static let devices: [String] = ["iPhone 8", "iPad Air"]
     
     static let codeSigningPath = environmentVariable(get: "CODESIGNING_PATH")
